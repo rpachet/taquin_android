@@ -3,13 +3,16 @@ package com.example.rpachet.taquin;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.Gravity;
 import android.view.View;
+import android.view.animation.Animation;
 import android.widget.AdapterView;
-import android.widget.Toast;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -19,6 +22,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     ArrayList<Bitmap> ImgList;
     Bitmap img;
     int m_size;
+    private ImageAdapter imageAdapter;
+    private Animation animation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +32,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Intent i = getIntent();
 
         String size = i.getStringExtra("size");
-        int checkSize = (int) Math.pow(Double.parseDouble(size),2);
+//        int checkSize = (int) Math.pow(Double.parseDouble(size),2);
+        int level = Integer.parseInt(size);
+
         String image = i.getStringExtra("image");
 
 //        Drawable drawable = getResources().getDrawable(Integer.parseInt(image),null);
@@ -36,46 +43,56 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), (Integer.parseInt(image)));
 
-        splitImage(bitmap,checkSize);
+//        splitImage(bitmap,checkSize);
 
-
+        Display d = getWindowManager().getDefaultDisplay();
+        DisplayMetrics m = new DisplayMetrics();
+        d.getMetrics(m);
 
         board = (GridView) findViewById(R.id.Board);
-        board.setAdapter(new ImageAdapter(this,ImgList));
+        imageAdapter = new ImageAdapter(this, level, bitmap, m.widthPixels, m.heightPixels);
+        board.setAdapter(imageAdapter);
+        board.setOnItemClickListener(this);
 
-        Toast.makeText(MainActivity.this, "" + size + " " +image ,
-                Toast.LENGTH_SHORT).show();
     }
+
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 
-    }
+        // Permutation des pièces de l'image
+        animation = imageAdapter.permutation(position);
+        View view = board.getChildAt(position); // on récupère la vue de l'enfant de la gridview à la position "position"
+        animation.setDuration(300); // time de l'animation
+//        String item = parent.getItemAtPosition(position).toString();
+//
+//        Toast.makeText(MainActivity.this, "" + item ,
+//                Toast.LENGTH_SHORT).show();
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
 
-    private void splitImage(Bitmap originImage, int chunkNumbers) {
-
-        //For the number of rows and columns of the grid to be displayed
-        int rows,cols;
-
-        //For height and width of the small image chunks
-        int chunkHeight,chunkWidth;
-
-        Bitmap bitmap = originImage;
-        Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth(), bitmap.getHeight(), true);
-        rows = cols = (int) Math.sqrt(chunkNumbers);
-        Toast.makeText(MainActivity.this, "sizeBox : " + rows,Toast.LENGTH_SHORT).show();
-        chunkHeight = bitmap.getHeight() / rows;
-        chunkWidth = bitmap.getWidth() / cols;
-
-        //xCoord and yCoord are the pixel positions of the image chunks
-        int yCoord = 0;
-        for(int x = 0; x < rows; x++) {
-            int xCoord = 0;
-            for(int y = 0; y < cols; y++) {
-                ImgList.add(Bitmap.createBitmap(scaledBitmap, xCoord, yCoord, chunkWidth, chunkHeight));
-                xCoord += chunkWidth;
             }
-            yCoord += chunkHeight;
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                // Rafraichissement après permutation
+                board.invalidateViews();
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        view.startAnimation(animation); // démarrage de l'animation
+        if(imageAdapter.bonOrdre()){
+            // Affichage d'un message pour féliciter le joueur
+            Toast toast = Toast.makeText(MainActivity.this, "Gagné ! Le jeu est terminé", Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+            board.setOnItemClickListener(null); // la partie est terminée, on stop le listner pour ne plus donner la possibilité de déplacer les cases
+//            btnRejouer.setVisibility(View.VISIBLE); // le bouton pour revenir à l'accueil s'affiche
         }
     }
 

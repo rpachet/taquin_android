@@ -28,7 +28,6 @@ import java.util.ArrayList;
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener,AdapterView.OnItemClickListener{
 
     ImageView image;
-    Button add;
     Button play;
     GridView grid;
     Spinner gridWith;
@@ -55,12 +54,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_home);
 
         image = (ImageView) findViewById(R.id.image);
-        add = (Button) findViewById(R.id.add);
         play = (Button) findViewById(R.id.play);
         grid = (GridView) findViewById(R.id.gridview);
         gridWith = (Spinner) findViewById(R.id.gridWith);
 
-        add.setOnClickListener(this);
         play.setOnClickListener(this);
 
 //        bitmapList = new ArrayList<Bitmap>();
@@ -88,13 +85,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.add:
-//                image.setImageResource(R.drawable.image);
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
-                break;
+
             case R.id.play:
 
 
