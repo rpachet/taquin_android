@@ -17,6 +17,7 @@ import java.util.ArrayList;
 public class ImageAdapter extends BaseAdapter {
     private Context mContext;
     private Bitmap vide;
+    private Bitmap videToAdd;
     private int level;
     private ArrayList<Bitmap> imgPieces;
     private ArrayList<Bitmap> ordrePieces;
@@ -75,20 +76,22 @@ public class ImageAdapter extends BaseAdapter {
             for(int j=0; j<level; j++){
                 if(i == level-1 && j == level-1){
                     vide = Bitmap.createBitmap(iw/level, ih/level, Bitmap.Config.ALPHA_8);
-                    Bitmap bout = vide;
-                    imgPieces.add(bout);
-                    ordrePieces.add(bout);
+                    Bitmap piece = vide;
+                    imgPieces.add(piece);
+                    ordrePieces.add(piece);
+                    videToAdd =  Bitmap.createBitmap(img, j*iw/level, i*ih/level, iw/level, ih/level);
+
                 }else{
-                    Bitmap bout = Bitmap.createBitmap(img, j*iw/level, i*ih/level, iw/level, ih/level);
-                    imgPieces.add(bout);
-                    ordrePieces.add(bout);
+                    Bitmap piece = Bitmap.createBitmap(img, j*iw/level, i*ih/level, iw/level, ih/level);
+                    imgPieces.add(piece);
+                    ordrePieces.add(piece);
                 }
             }
         }
     }
 
-    // permutation des morceaux avec la position du morceau cliqué en paramètre
-    public  Animation permutation(int position){
+    // deplacement des morceaux avec la position du morceau cliqué en paramètre
+    public  Animation deplacement(int position){
         int caseVide = imgPieces.indexOf(vide); // récupération de la position du morceau vide
         int[] testCase = {0,0,0,0};
         // Initialisation des valeurs de destinations de l'animation
@@ -109,22 +112,22 @@ public class ImageAdapter extends BaseAdapter {
             if(position-level != 0){
                 testCase[3] = position-level;
             }
-            // on va tester les 4 cotés du bout d'image pour savoir si on a la case vide
+            // on va tester les 4 cotés du piece d'image pour savoir si on a la case vide
             for(int i=0; i<4; i++){
                 if(testCase[i] == caseVide){
-                    // on attribut des valeurs aux variables de points de destination pour l'animation
-                    // vers la droite, on veux que l'image se décale de 1 fois sa taille en x donc vers la droite
+
+                    // vers la droite
                     if(i==0){
                         destinationX = 1;
-                    }else if(i==1){ // vers le bas, on veux que l'image se décale de 1 fois sa taille en y donc vers le bas
+                    }else if(i==1){ // vers le bas
                         destinationY = 1;
-                    }else if(i==2){ // vers la gauche, on veux que l'image se décale de 1 fois sa taille en x donc vers la gauche
+                    }else if(i==2){ // vers la gauche
                         destinationX = -1;
-                    }else if(i==3){ // vers le haut, on veux que l'image se décale de 1 fois sa taille en y donc vers le haut
+                    }else if(i==3){ // vers le haut
                         destinationY = -1;
                     }
 
-                    // si on tombe sur la case vide on permute les cases
+                    // si case vide
                     Bitmap temp = imgPieces.get(position);
                     imgPieces.set(position, vide);
                     imgPieces.set(caseVide, temp);
@@ -137,24 +140,24 @@ public class ImageAdapter extends BaseAdapter {
         return animation;
     }
 
-    //1000 fois nous allons fair ejouer aléatoirement le jeu tout seul pour le mélanger, ceci évite de tomber sur un problème non résolvable
+    //melange aléatoire 1000 fois
     public void melange(){
         for(int i=0; i<1000; i++){ // Nb de fois que l'on va jouer aléatoirement pour mélanger le jeu
             int currentPosition = imgPieces.indexOf(vide); // on récupère la position courante de la case vide
             int random = (int) (Math.random()*level); // valeur de random en fonction du nombre de cases du jeu
 
-            // on effectue la permutation en fonction du chiffre retourné par random
+            // on effectue la deplacement en fonction du chiffre retourné par random
             if(random == 0){
-                permutation(currentPosition+1);
+                deplacement(currentPosition+1);
             }
             if(random == 1){
-                permutation(currentPosition+level);
+                deplacement(currentPosition+level);
             }
             if(random == 2){
-                permutation(currentPosition-1);
+                deplacement(currentPosition-1);
             }
             if(random == 3){
-                permutation(currentPosition-level);
+                deplacement(currentPosition-level);
             }
         }
     }
@@ -171,7 +174,7 @@ public class ImageAdapter extends BaseAdapter {
                 }
             }
         }
-        // à la fin des itérations si aucune différence n'est détecté on retourne true, le jeu est dans le bon ordre
+        imgPieces.set(imgPieces.indexOf(vide), videToAdd);
         return true;
     }
 }

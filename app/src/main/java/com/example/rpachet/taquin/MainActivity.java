@@ -11,12 +11,13 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener {
 
     GridView board;
     ArrayList<Bitmap> ImgList;
@@ -24,7 +25,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     int m_size;
     private ImageAdapter imageAdapter;
     private Animation animation;
-
+    Button btnRejouer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +53,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         board = (GridView) findViewById(R.id.Board);
         imageAdapter = new ImageAdapter(this, level, bitmap, m.widthPixels, m.heightPixels);
         board.setAdapter(imageAdapter);
+        // On set le nombre de colonne selon le niveau
+        board.setNumColumns(level);
         board.setOnItemClickListener(this);
+        btnRejouer = (Button) findViewById(R.id.btnRejouer);
+        btnRejouer.setOnClickListener(this);
+        btnRejouer.setVisibility(View.INVISIBLE); // le bouton pour revenir est inviisible
 
     }
 
@@ -61,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 
         // Permutation des pièces de l'image
-        animation = imageAdapter.permutation(position);
+        animation = imageAdapter.deplacement(position);
         View view = board.getChildAt(position); // on récupère la vue de l'enfant de la gridview à la position "position"
         animation.setDuration(300); // time de l'animation
 //        String item = parent.getItemAtPosition(position).toString();
@@ -87,13 +93,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         });
         view.startAnimation(animation); // démarrage de l'animation
         if(imageAdapter.bonOrdre()){
-            // Affichage d'un message pour féliciter le joueur
+            // Affichage du message de victoire
             Toast toast = Toast.makeText(MainActivity.this, "Gagné ! Le jeu est terminé", Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
             board.setOnItemClickListener(null); // la partie est terminée, on stop le listner pour ne plus donner la possibilité de déplacer les cases
-//            btnRejouer.setVisibility(View.VISIBLE); // le bouton pour revenir à l'accueil s'affiche
+            btnRejouer.setVisibility(View.VISIBLE); // le bouton pour revenir à l'accueil s'affiche
         }
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+
+            case R.id.btnRejouer:
+
+
+                Intent activityMain = new Intent(MainActivity.this,HomeActivity.class);
+
+
+                startActivity(activityMain);
+        }
+    }
 }
