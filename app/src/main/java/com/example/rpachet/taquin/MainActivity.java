@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -22,6 +24,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener {
@@ -35,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Chronometer timer;
     String time;
     JSONArray scoresJson;
+    Bitmap bitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,18 +47,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Intent i = getIntent();
 
         String size = i.getStringExtra("size");
-//        int checkSize = (int) Math.pow(Double.parseDouble(size),2);
         int level = Integer.parseInt(size);
 
         String image = i.getStringExtra("image");
+        Uri imageURL = i.getParcelableExtra("imageURL");
+        String TypeImage = i.getStringExtra("TypeImage");
 
-//        Drawable drawable = getResources().getDrawable(Integer.parseInt(image),null);
-
+        Toast.makeText(this, TypeImage, Toast.LENGTH_SHORT).show();
+//
         ImgList = new ArrayList<Bitmap>();
+        bitmap = null;
 
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), (Integer.parseInt(image)));
+        if (TypeImage.equals("URI")){
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(),imageURL);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            bitmap = BitmapFactory.decodeResource(getResources(), (Integer.parseInt(image)));
+        }
 
-//        splitImage(bitmap,checkSize);
 
         Display d = getWindowManager().getDefaultDisplay();
         DisplayMetrics m = new DisplayMetrics();
@@ -73,7 +88,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         score = (Button) findViewById(R.id.score);
         score.setOnClickListener(this);
-//        score.setVisibility(View.INVISIBLE); // Bouton score invisible
+        score.setVisibility(View.INVISIBLE); // Bouton score invisible
+
         timer = (Chronometer) findViewById(R.id.timer); // Initialisation du chrono
 
         timer.start();
@@ -87,10 +103,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         animation = imageAdapter.deplacement(position);
         View view = board.getChildAt(position);
         animation.setDuration(300); // time de l'animation
-//        String item = parent.getItemAtPosition(position).toString();
-//
-//        Toast.makeText(MainActivity.this, "" + item ,
-//                Toast.LENGTH_SHORT).show();
+
+
         animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
@@ -120,18 +134,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             btnRejouer.setVisibility(View.VISIBLE); // le bouton pour revenir à l'accueil s'affiche
             score.setVisibility(View.VISIBLE); // le bouton pour le score s'affiche
 
-//            SharedPreferences sharedPreferences = this.getSharedPreferences("PREFS", Context.MODE_PRIVATE);
-//            sharedPreferences = this.getSharedPreferences("PREFS", Context.MODE_PRIVATE);
-//
-//            sharedPreferences.edit()
-//                    .putString("score","")
-//                    .apply();
-
-
             SharedPreferences sharedPreferences = this.getSharedPreferences("PREFS", Context.MODE_PRIVATE);
             String scores = sharedPreferences.getString("score",null);
-
-            Toast.makeText(this, scores.toString(), Toast.LENGTH_SHORT).show();
 
             if(scores !=  null && scores != "" ){
                 try {
@@ -155,8 +159,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             scoresJson.put(score);
 
-            Toast.makeText(MainActivity.this, "" + scoresJson.toString() ,
-                    Toast.LENGTH_SHORT).show();
+
             sharedPreferences = this.getSharedPreferences("PREFS", Context.MODE_PRIVATE);
 
             sharedPreferences.edit()
@@ -177,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
                 startActivity(activityHome);
+                break;
 
             case R.id.score:
                 Intent activityScore= new Intent(MainActivity.this,ScoreActivity.class);

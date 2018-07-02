@@ -42,7 +42,6 @@ public class ImageAdapter extends BaseAdapter {
 
 
     public long getItemId(int position) {
-//        return bitmapList.get(position);
         return 0;
     }
 
@@ -56,7 +55,7 @@ public class ImageAdapter extends BaseAdapter {
         } else {
             imageView = (ImageView) convertView;
         }
-        // on place tous les morceaux dans la grille
+        //Placement des pieces dans grille
         imageView.setImageBitmap(imgPieces.get(position));
         imageView.setAdjustViewBounds(true);
         return imageView;
@@ -65,24 +64,24 @@ public class ImageAdapter extends BaseAdapter {
 
     private void decoupe(Bitmap img, int w, int h) {
         imgPieces = new ArrayList<>(); // stockage des pieces dans une ArrayList
-        ordrePieces = new ArrayList<>(); // Tableau qui contiendra les morceaux dans l'ordre
+        ordrePieces = new ArrayList<>(); // Tableau des pieces dans l'ordre
 
         // Récupération des tailles de la bitmap
-        int iw = img.getWidth();
-        int ih = img.getHeight();
+        int width = img.getWidth();
+        int height = img.getHeight();
 
         // Découpe de l'image
         for(int i=0; i<level; i++){
             for(int j=0; j<level; j++){
                 if(i == level-1 && j == level-1){
-                    vide = Bitmap.createBitmap(iw/level, ih/level, Bitmap.Config.ALPHA_8);
+                    vide = Bitmap.createBitmap(width/level, height/level, Bitmap.Config.ALPHA_8);
                     Bitmap piece = vide;
                     imgPieces.add(piece);
                     ordrePieces.add(piece);
-                    videToAdd =  Bitmap.createBitmap(img, j*iw/level, i*ih/level, iw/level, ih/level);
+                    videToAdd =  Bitmap.createBitmap(img, j*width/level, i*height/level, width/level, height/level);
 
                 }else{
-                    Bitmap piece = Bitmap.createBitmap(img, j*iw/level, i*ih/level, iw/level, ih/level);
+                    Bitmap piece = Bitmap.createBitmap(img, j*width/level, i*height/level, width/level, height/level);
                     imgPieces.add(piece);
                     ordrePieces.add(piece);
                 }
@@ -90,7 +89,7 @@ public class ImageAdapter extends BaseAdapter {
         }
     }
 
-    // deplacement des pieces avec la position du morceau cliqué en paramètre
+    // Deplacement pieces - position de la piece en paramètre
     public  Animation deplacement(int position){
         int caseVide = imgPieces.indexOf(vide); // récupération de la position de la piece vide
         int[] testCase = {0,0,0,0};
@@ -128,7 +127,9 @@ public class ImageAdapter extends BaseAdapter {
                     }
 
                     // si case vide
+
                     Bitmap temp = imgPieces.get(position);
+
                     imgPieces.set(position, vide);
                     imgPieces.set(caseVide, temp);
                 }
@@ -142,11 +143,11 @@ public class ImageAdapter extends BaseAdapter {
 
     //melange aléatoire 1000 fois
     public void melange(){
-        for(int i=0; i<100; i++){ // Nb de fois que l'on va jouer aléatoirement pour mélanger le jeu
-            int currentPosition = imgPieces.indexOf(vide); // on récupère la position courante de la case vide
-            int random = (int) (Math.random()*level); // valeur de random en fonction du nombre de cases du jeu
+        for(int i=0; i<1000; i++){ // Nb de coup joué
+            int currentPosition = imgPieces.indexOf(vide); //position  de la case vide
+            int random = (int) (Math.random()*level); // random en fonction du nb case du jeu
 
-            // on effectue la deplacement en fonction du chiffre retourné par random
+            // déplacement en fonction du random
             if(random == 0){
                 deplacement(currentPosition+1);
             }
@@ -164,9 +165,9 @@ public class ImageAdapter extends BaseAdapter {
 
     // Test si le jeu est terminé
     public boolean bonOrdre(){
-        // pour chaque morceaux de l'image
+        // pour chaque piece de l'image
         for(int i=0; i<ordrePieces.size(); i++){
-            // si le morceau n'est pas le morceau vide
+            // si la piece n'est pas la piece vide
             if(ordrePieces.get(i) != null){
                 // si les deux pieces sont différent on retourne false, le jeu n'est pas terminé
                 if(!ordrePieces.get(i).sameAs(imgPieces.get(i))){
