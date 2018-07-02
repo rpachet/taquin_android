@@ -11,6 +11,13 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.rpachet.taquin.MainActivity">
 
+    <Chronometer
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/timer" />
+
     <GridView
         android:id="@+id/Board"
         android:layout_height="350dp"
@@ -18,15 +25,27 @@
         android:numColumns="auto_fit"
         android:stretchMode="columnWidth"
         android:gravity="center"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_below="@+id/timer"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="12dp" />
+
+    <Button
+        android:text="Score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/btnRejouer"
+        android:layout_alignRight="@+id/btnRejouer"
+        android:layout_alignEnd="@+id/btnRejouer"
+        android:layout_marginTop="50dp"
+        android:id="@+id/score" />
 
     <Button
         android:id="@+id/btnRejouer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="35dp"
-        android:text="Rejouer" />
+        android:text="Rejouer"
+        android:layout_below="@+id/Board"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>

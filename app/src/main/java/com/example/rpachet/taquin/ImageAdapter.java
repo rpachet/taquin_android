@@ -90,9 +90,9 @@ public class ImageAdapter extends BaseAdapter {
         }
     }
 
-    // deplacement des morceaux avec la position du morceau cliqué en paramètre
+    // deplacement des pieces avec la position du morceau cliqué en paramètre
     public  Animation deplacement(int position){
-        int caseVide = imgPieces.indexOf(vide); // récupération de la position du morceau vide
+        int caseVide = imgPieces.indexOf(vide); // récupération de la position de la piece vide
         int[] testCase = {0,0,0,0};
         // Initialisation des valeurs de destinations de l'animation
         float destinationX = 0;
@@ -112,7 +112,7 @@ public class ImageAdapter extends BaseAdapter {
             if(position-level != 0){
                 testCase[3] = position-level;
             }
-            // on va tester les 4 cotés du piece d'image pour savoir si on a la case vide
+            // On test les 4 cotes de la piece
             for(int i=0; i<4; i++){
                 if(testCase[i] == caseVide){
 
@@ -134,7 +134,7 @@ public class ImageAdapter extends BaseAdapter {
                 }
             }
         }
-        // on créé l'animation, avec relative_to_self on dit que la valeur est un pourcentage de l'image, ici 1 est égale à 100%
+        // on créé l'animation
         animation = new TranslateAnimation(TranslateAnimation.RELATIVE_TO_SELF, (float)0, TranslateAnimation.RELATIVE_TO_SELF, destinationX,
                 TranslateAnimation.RELATIVE_TO_SELF, (float)0, TranslateAnimation.RELATIVE_TO_SELF, destinationY);
         return animation;
@@ -142,7 +142,7 @@ public class ImageAdapter extends BaseAdapter {
 
     //melange aléatoire 1000 fois
     public void melange(){
-        for(int i=0; i<1000; i++){ // Nb de fois que l'on va jouer aléatoirement pour mélanger le jeu
+        for(int i=0; i<100; i++){ // Nb de fois que l'on va jouer aléatoirement pour mélanger le jeu
             int currentPosition = imgPieces.indexOf(vide); // on récupère la position courante de la case vide
             int random = (int) (Math.random()*level); // valeur de random en fonction du nombre de cases du jeu
 
